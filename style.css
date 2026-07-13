@@ -62,7 +62,7 @@ input:hover, textarea:hover {
 }
 
 input:focus, textarea:focus {
-  border-color: #f06449;
+  border-color: #0a1831;
 }
 
 .container {
@@ -98,7 +98,7 @@ input:focus, textarea:focus {
 }
 
 .orange {
-  color: #f06449 !important;
+  color: #ad4e14 !important;
 }
 
 .link__hover-effect {
@@ -154,7 +154,7 @@ nav,
   color: white;
 }
 .dark-theme section {
-  background-color: #242424;
+  background-color: #0a1831;
 }
 .dark-theme #personal-logo {
   filter: none;
@@ -201,7 +201,7 @@ nav,
 }
 
 .social__link {
-  background-color: #f06449;
+  background-color: #0a1831;
   color: white;
   padding: 6px;
   width: 32px;
@@ -271,6 +271,11 @@ nav,
   
 */
 
+.nav__wrapper {
+  width: 100%;
+  background-color: #0a1a3c;
+}
+
 nav {
   display: flex;
   justify-content: space-between;
@@ -283,9 +288,8 @@ nav {
 }
 
 #personal-logo {
-  width: 50px;
-  height: 50px;
-  filter: invert(1);
+  height: 60px; /* adjust to match nav height / David's original size */
+  width: auto;
 }
 
 .nav__link--list {
@@ -298,7 +302,7 @@ nav {
 
 .nav__link--anchor {
   font-size: 16px;
-  color: #242424;
+  color: #ffffff;
   font-weight: 700;
 }
 
@@ -358,7 +362,7 @@ nav {
 }
 
 .modal__language {
-  width: 25%;
+  width: 33.333%;
   padding: 16px;
   position: relative;
   display: flex;
@@ -389,7 +393,7 @@ nav {
 
 .modal__contact {
   transform: translateX(110%);
-  background-color: #242424;
+  background-color: #5271ff;
   color: white;
 }
 
@@ -412,8 +416,8 @@ nav {
 }
 
 .form__submit {
-  background-color: #f06449;
-  border: 2px solid #f06449;
+  background-color: #ad4e14;
+  border: 2px solid #ad4e14;
   color: white;
   font-weight: 700;
   width: 100%;
@@ -577,7 +581,7 @@ nav {
 
 footer {
   position: relative;
-  background-color: #242424;
+  background-color: #0a1831;
   display: flex;
   padding: 6% 0;
 }
