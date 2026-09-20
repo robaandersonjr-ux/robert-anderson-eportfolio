@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Habit Stacking · Robert Anderson UX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── DESIGN TOKENS ─── */
+    :root {
+      --navy:        #0B1628;
+      --navy-mid:    #112040;
+      --navy-light:  #1A2F55;
+      --electric:    #2D6FF2;
+      --electric-glow: rgba(45, 111, 242, 0.18);
+      --burnt:       #E05C2A;
+      --burnt-light: rgba(224, 92, 42, 0.12);
+      --white:       #F4F7FF;
+      --muted:       #8A9BBC;
+      --card-bg:     rgba(17, 32, 64, 0.7);
+      --border:      rgba(45, 111, 242, 0.18);
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+      --radius:       12px;
+      --radius-lg:    20px;
+    }
+
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: var(--navy);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── NOISE TEXTURE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 2.5rem;
+      background: rgba(11, 22, 40, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+      color: var(--white);
+    }
+    .nav-logo span { color: var(--electric); }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 5rem 2rem 3rem;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--electric);
+      background: var(--electric-glow);
+      border: 1px solid rgba(45, 111, 242, 0.3);
+      border-radius: 100px;
+      padding: 0.35rem 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--white);
+      margin-bottom: 1.2rem;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--burnt);
+    }
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+      font-weight: 300;
+    }
+
+    /* ─── CTA BUTTONS ─── */
+    .cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 3.5rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 0.75rem 1.6rem;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      text-decoration: none;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background: var(--electric);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(45, 111, 242, 0.35);
+    }
+    .btn-primary:hover { box-shadow: 0 6px 28px rgba(45, 111, 242, 0.5); }
+    .btn-accent {
+      background: var(--burnt);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(224, 92, 42, 0.3);
+    }
+    .btn-accent:hover { box-shadow: 0 6px 28px rgba(224, 92, 42, 0.45); }
+    .btn-outline {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { color: var(--white); border-color: rgba(45, 111, 242, 0.5); }
+
+    /* icon within btn */
+    .btn svg { flex-shrink: 0; }
+
+    /* ─── META STRIP ─── */
+    .meta-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem 2rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 4rem;
+    }
+    .meta-strip span { display: flex; align-items: center; gap: 0.4rem; }
+    .meta-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--electric);
+      display: inline-block;
+    }
+
+    /* ─── HERO IMAGE FRAME ─── */
+    .hero-frame {
+      position: relative;
+      max-width: 860px;
+      margin: 0 auto 6rem;
+      z-index: 1;
+      padding: 0 2rem;
+    }
+    .hero-frame-inner {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--navy-mid);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(45,111,242,0.08);
+    }
+    .hero-mockup {
+      width: 100%;
+      height: 420px;
+      background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy-light) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    /* brick pattern */
+    .hero-mockup::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 39px,
+          rgba(45,111,242,0.06) 39px,
+          rgba(45,111,242,0.06) 40px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 79px,
+          rgba(45,111,242,0.04) 79px,
+          rgba(45,111,242,0.04) 80px
+        );
+    }
+    .mockup-phones {
+      display: flex;
+      align-items: flex-end;
+      gap: 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+    .phone {
+      width: 120px;
+      border-radius: 20px;
+      border: 2px solid rgba(45,111,242,0.3);
+      background: var(--navy);
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      transition: transform 0.4s ease;
+    }
+    .phone:hover { transform: translateY(-8px); }
+    .phone-tall { height: 220px; }
+    .phone-short { height: 180px; transform: translateY(20px); }
+    .phone-inner {
+      height: 100%;
+      padding: 1rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .p-bar { height: 6px; border-radius: 4px; background: var(--electric); opacity: 0.7; }
+    .p-bar-sm { width: 60%; }
+    .p-bar-lg { width: 90%; }
+    .p-brick {
+      height: 28px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--burnt) 0%, rgba(224,92,42,0.5) 100%);
+      margin-top: 0.3rem;
+    }
+    .p-brick-sm { height: 20px; opacity: 0.6; }
+    .p-dot-row {
+      display: flex;
+      gap: 0.3rem;
+      margin-top: auto;
+    }
+    .p-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--electric);
+      opacity: 0.5;
+    }
+    .p-dot.active { opacity: 1; }
+
+    /* ─── MAIN CONTENT ─── */
+    .content-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── SECTION LABEL ─── */
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--electric);
+      margin-bottom: 0.6rem;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+    .section-body {
+      color: var(--muted);
+      font-size: 0.97rem;
+      line-height: 1.8;
+      max-width: 680px;
+    }
+
+    /* ─── DIVIDER ─── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 4rem 0;
+    }
+
+    /* ─── CARDS GRID ─── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .card:hover {
+      border-color: rgba(45, 111, 242, 0.4);
+      transform: translateY(-3px);
+    }
+    .card-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+    .card-icon-blue { background: var(--electric-glow); }
+    .card-icon-burnt { background: var(--burnt-light); }
+    .card h3 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.4rem;
+    }
+    .card p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ─── PROCESS STEPS ─── */
+    .process-list { margin-top: 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .process-step {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+    .step-num {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: var(--electric-glow);
+      border: 1px solid rgba(45,111,242,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--electric);
+      flex-shrink: 0;
+    }
+    .step-content h4 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.3rem;
+    }
+    .step-content p { font-size: 0.875rem; color: var(--muted); }
+
+    /* ─── INSIGHT CALLOUT ─── */
+    .insight-box {
+      background: var(--burnt-light);
+      border: 1px solid rgba(224, 92, 42, 0.25);
+      border-left: 3px solid var(--burnt);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.75rem;
+      margin: 2rem 0;
+      font-size: 0.95rem;
+      color: var(--white);
+      line-height: 1.7;
+    }
+    .insight-box strong { color: var(--burnt); font-weight: 600; }
+
+    /* ─── OUTCOMES GRID ─── */
+    .outcomes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+    .outcome-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.25rem;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+    .outcome-num {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--electric);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .outcome-label { font-size: 0.8rem; color: var(--muted); }
+
+    /* ─── TOOLS PILLS ─── */
+    .tools-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1.25rem;
+    }
+    .pill {
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 0.35rem 0.9rem;
+      border-radius: 100px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
+    /* ─── BOTTOM CTA ─── */
+    .bottom-cta {
+      text-align: center;
+      padding: 5rem 2rem 6rem;
+      position: relative;
+      z-index: 1;
+    }
+    .bottom-cta p {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── FADE IN ANIMATION ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up {
+      animation: fadeUp 0.7s ease both;
+    }
+    .fade-up-1 { animation-delay: 0.1s; }
+    .fade-up-2 { animation-delay: 0.22s; }
+    .fade-up-3 { animation-delay: 0.34s; }
+    .fade-up-4 { animation-delay: 0.46s; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { gap: 1.2rem; }
+      .hero { padding: 3.5rem 1.25rem 2rem; }
+      .content-wrap { padding: 0 1.25rem; }
+      .hero-frame { padding: 0 1.25rem; }
+      footer { flex-direction: column; gap: 0.75rem; text-align: center; }
+      .mockup-phones { gap: 1rem; }
+      .phone { width: 96px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── NAV ─── -->
+  <nav>
+    <a href="index.html" class="nav-logo">robert anderson <span>ux</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html#work">Work</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#resume">Resume</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <div class="hero-eyebrow fade-up fade-up-1">Case Study · Mobile UX</div>
+    <h1 class="fade-up fade-up-2">Habit Stacking <em>App</em></h1>
+    <p class="hero-sub fade-up fade-up-3">
+      A behavior-driven mobile experience that helps users build lasting routines —
+      one brick at a time.
+    </p>
+    <div class="cta-group fade-up fade-up-4">
+      <!-- Download PDF: update href to your actual PDF path -->
+      <a href="habit-stacking-portfolio.pdf" download class="btn btn-primary">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v13M5 14l7 7 7-7"/><path d="M3 21h18"/></svg>
+        Download Case Study PDF
+      </a>
+      <a href="https://www.figma.com/make/xKV1dRxRbEqyvW3PDHMglJ/Habit-Stacking-App?p=f&t=L27trNGNlG98WnLS-0&fullscreen=1" target="_blank" class="btn btn-accent">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        View Prototype
+      </a>
+      <a href="index.html" class="btn btn-outline">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to Portfolio
+      </a>
+    </div>
+    <div class="meta-strip fade-up fade-up-4">
+      <span><span class="meta-dot"></span> Role: UX Designer &amp; Researcher</span>
+      <span><span class="meta-dot"></span> Platform: iOS / Android</span>
+      <span><span class="meta-dot"></span> Duration: 6 Weeks</span>
+      <span><span class="meta-dot"></span> Status: Prototype Complete</span>
+    </div>
+  </section>
+
+  <!-- ─── HERO MOCKUP FRAME ─── -->
+  <div class="hero-frame fade-up fade-up-4">
+    <div class="hero-frame-inner">
+      <div class="hero-mockup">
+        <div class="mockup-phones">
+          <!-- Phone 1 -->
+          <div class="phone phone-short">
+            <div class="phone-inner">
+              <div class="p-bar p-bar-sm"></div>
+              <div class="p-bar p-bar-lg" style="opacity:0.3;"></div>
+              <div class="p-brick" style="margin-top:0.5rem;"></div>
+              <div class="p-brick p-brick-sm"></div>
+              <div class="p-dot-row">
+                <div class="p-dot active"></div>
+                <div class="p-dot"></div>
+                <div class="p-dot"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Phone 2 (center, tallest) -->
+          <div class="phone phone-tall">
+            <div class="phone-inner">
+              <div class="p-bar p-bar-sm"></div>
+              <div class="p-bar p-bar-lg" style="opacity:0.3;"></div>
+              <div class="p-brick"></div>
+              <div class="p-brick p-brick-sm"></div>
+              <div class="p-brick p-brick-sm" style="opacity:0.4;"></div>
+              <div class="p-brick p-brick-sm" style="opacity:0.25;"></div>
+              <div class="p-dot-row">
+                <div class="p-dot"></div>
+                <div class="p-dot active"></div>
+                <div class="p-dot"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Phone 3 -->
+          <div class="phone phone-short">
+            <div class="phone-inner">
+              <div class="p-bar p-bar-sm"></div>
+              <div class="p-bar p-bar-lg" style="opacity:0.3;"></div>
+              <div class="p-brick" style="background: linear-gradient(90deg, var(--electric) 0%, rgba(45,111,242,0.5) 100%);"></div>
+              <div class="p-brick p-brick-sm" style="background: linear-gradient(90deg, var(--electric) 0%, rgba(45,111,242,0.5) 100%); opacity:0.6;"></div>
+              <div class="p-dot-row">
+                <div class="p-dot"></div>
+                <div class="p-dot"></div>
+                <div class="p-dot active"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <div class="content-wrap">
+
+    <!-- Overview -->
+    <section>
+      <div class="section-label">Overview</div>
+      <h2 class="section-title">The Problem Worth Solving</h2>
+      <p class="section-body">
+        Most habit-tracking apps focus on streaks and checkboxes — but they don't address
+        <em>why</em> habits break. Users quit not because they lack discipline, but because
+        the apps don't support them when life disrupts their routines. The Habit Stacking app
+        was designed to meet users where they are, using a "brick by brick" metaphor that
+        makes progress feel tangible, forgiving, and worth continuing.
+      </p>
+
+      <div class="insight-box">
+        <strong>Core Insight:</strong> The biggest drop-off happens not at Day 1, but at Day 3–7,
+        when the novelty fades and friction kicks in. The app's Replacement Brick system directly
+        addresses this failure point.
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Challenge + Goals -->
+    <section>
+      <div class="section-label">Challenge &amp; Goals</div>
+      <h2 class="section-title">What We Were Designing For</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-icon card-icon-blue">🎯</div>
+          <h3>Reduce Early Drop-Off</h3>
+          <p>Design a system that keeps users engaged through the critical first two weeks.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon card-icon-burnt">🧱</div>
+          <h3>Make Progress Visible</h3>
+          <p>Give users a physical metaphor — building a wall of bricks — that communicates momentum.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon card-icon-blue">🔄</div>
+          <h3>Handle Failure Gracefully</h3>
+          <p>Introduce a Replacement Brick mechanic so a missed day feels like a pivot, not a failure.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon card-icon-burnt">⚡</div>
+          <h3>Minimize Onboarding Friction</h3>
+          <p>Get users to their first habit logged in under 90 seconds from first launch.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Research -->
+    <section>
+      <div class="section-label">Research</div>
+      <h2 class="section-title">Understanding the User</h2>
+      <p class="section-body">
+        I conducted competitive analysis across five leading habit apps and synthesized
+        themes from 12 user interviews with adults aged 22–40 who had tried and abandoned
+        at least two habit apps in the previous year.
+      </p>
+      <div class="process-list" style="margin-top: 2rem;">
+        <div class="process-step">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h4>Competitive Analysis</h4>
+            <p>Audited Habitica, Streaks, Fabulous, Finch, and Productive — mapping where each lost users and what gamification mechanisms they used.</p>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h4>User Interviews (n=12)</h4>
+            <p>Semi-structured conversations exploring habit motivations, failure triggers, and what "success" looked like. Synthesized into an affinity map with 4 major themes.</p>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h4>Persona Development</h4>
+            <p>Defined two primary personas: The Restarter (rebuilding after burnout) and The Optimizer (adding structure to an already-productive life).</p>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <h4>How Might We Statements</h4>
+            <p>Reframed research insights into four HMW statements that guided the ideation phase and kept the team anchored to user needs.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Design System -->
+    <section>
+      <div class="section-label">Design System</div>
+      <h2 class="section-title">Brick by Brick Visual Language</h2>
+      <p class="section-body">
+        The design system reflects the core metaphor. Colors signal state: Deep Green for
+        active habits, Burnt Orange for replacement bricks, Soft Mint for streaks, and
+        Golden Yellow for milestone celebrations. Every UI element reinforces the feeling
+        of building something real.
+      </p>
+
+      <!-- Color palette display -->
+      <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-top:1.75rem;">
+        <div style="flex:1; min-width:100px;">
+          <div style="height:60px; border-radius:10px; background:#2A7A4B; border:1px solid rgba(255,255,255,0.08);"></div>
+          <p style="font-size:0.75rem; color:var(--muted); margin-top:0.4rem;">Deep Green<br>#2A7A4B</p>
+        </div>
+        <div style="flex:1; min-width:100px;">
+          <div style="height:60px; border-radius:10px; background:#E05C2A; border:1px solid rgba(255,255,255,0.08);"></div>
+          <p style="font-size:0.75rem; color:var(--muted); margin-top:0.4rem;">Burnt Orange<br>#E05C2A</p>
+        </div>
+        <div style="flex:1; min-width:100px;">
+          <div style="height:60px; border-radius:10px; background:#9EDBC8; border:1px solid rgba(255,255,255,0.08);"></div>
+          <p style="font-size:0.75rem; color:var(--muted); margin-top:0.4rem;">Soft Mint<br>#9EDBC8</p>
+        </div>
+        <div style="flex:1; min-width:100px;">
+          <div style="height:60px; border-radius:10px; background:#F5C842; border:1px solid rgba(255,255,255,0.08);"></div>
+          <p style="font-size:0.75rem; color:var(--muted); margin-top:0.4rem;">Golden Yellow<br>#F5C842</p>
+        </div>
+        <div style="flex:1; min-width:100px;">
+          <div style="height:60px; border-radius:10px; background:#0B1628; border:1px solid rgba(255,255,255,0.12);"></div>
+          <p style="font-size:0.75rem; color:var(--muted); margin-top:0.4rem;">Deep Navy<br>#0B1628</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Key Features -->
+    <section>
+      <div class="section-label">Key Features</div>
+      <h2 class="section-title">The Mechanics That Matter</h2>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-icon card-icon-blue">🧱</div>
+          <h3>Brick Builder</h3>
+          <p>Each completed habit adds a brick to the user's visible wall. The wall becomes a personal artifact of consistency.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon card-icon-burnt">🔁</div>
+          <h3>Replacement Brick</h3>
+          <p>Miss a habit? Log a related micro-action instead. The wall keeps growing — a missed day is never a wasted day.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon card-icon-blue">🔗</div>
+          <h3>Habit Stacking</h3>
+          <p>Chain habits together using anchor triggers. The app guides users through a pairing flow backed by behavioral science.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon card-icon-burnt">🏆</div>
+          <h3>Milestone Moments</h3>
+          <p>At Days 7, 21, and 66, the app celebrates with full-screen animations and badge unlocks that feel worth sharing.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Outcomes -->
+    <section>
+      <div class="section-label">Outcomes</div>
+      <h2 class="section-title">What the Testing Revealed</h2>
+      <p class="section-body">
+        Usability testing across 8 participants (2 rounds, SUS scoring) validated the core
+        flows and surfaced several iterations. The Replacement Brick mechanic was the
+        highest-rated feature — nearly every tester called it "the thing that would actually
+        keep me using this."
+      </p>
+      <div class="outcomes-grid">
+        <div class="outcome-card">
+          <div class="outcome-num">88</div>
+          <div class="outcome-label">SUS Score (Excellent)</div>
+        </div>
+        <div class="outcome-card">
+          <div class="outcome-num">90s</div>
+          <div class="outcome-label">Avg. First-Habit Time</div>
+        </div>
+        <div class="outcome-card">
+          <div class="outcome-num">8/8</div>
+          <div class="outcome-label">Testers Liked Repl. Brick</div>
+        </div>
+        <div class="outcome-card">
+          <div class="outcome-num">2</div>
+          <div class="outcome-label">Iteration Rounds</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Reflection -->
+    <section>
+      <div class="section-label">Reflection</div>
+      <h2 class="section-title">What I'd Do Differently</h2>
+      <p class="section-body">
+        Given more time, I'd run a longitudinal study to measure actual retention past Week 2.
+        The Replacement Brick system was hypothesized to reduce churn, but real behavioral data
+        would sharpen that story significantly. I'd also explore push notification personalization
+        — timing habit reminders to each user's logged peak-energy window rather than a static
+        schedule.
+      </p>
+
+      <div class="insight-box" style="margin-top:2rem;">
+        <strong>Biggest takeaway:</strong> Habit apps live or die on the emotional resonance of
+        failure states. Getting the "you missed a day" moment right is just as important as
+        celebrating a streak.
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Tools -->
+    <section>
+      <div class="section-label">Tools &amp; Methods</div>
+      <h2 class="section-title">How It Was Built</h2>
+      <div class="tools-list">
+        <span class="pill">Figma</span>
+        <span class="pill">FigJam</span>
+        <span class="pill">React</span>
+        <span class="pill">TypeScript</span>
+        <span class="pill">HTML / CSS</span>
+        <span class="pill">Affinity Mapping</span>
+        <span class="pill">User Interviews</span>
+        <span class="pill">SUS Testing</span>
+        <span class="pill">Competitive Analysis</span>
+        <span class="pill">Persona Development</span>
+        <span class="pill">Prototype Testing</span>
+        <span class="pill">HMW Framework</span>
+      </div>
+    </section>
+
+  </div><!-- /content-wrap -->
+
+  <!-- ─── BOTTOM CTA ─── -->
+  <div class="bottom-cta">
+    <p>Ready to see more of my work?</p>
+    <div class="cta-group">
+      <a href="habit-stacking-portfolio.pdf" download class="btn btn-primary">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v13M5 14l7 7 7-7"/><path d="M3 21h18"/></svg>
+        Download Case Study PDF
+      </a>
+      <a href="https://www.figma.com/make/xKV1dRxRbEqyvW3PDHMglJ/Habit-Stacking-App?p=f&fullscreen=1" target="_blank" class="btn btn-accent">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        View Prototype
+      </a>
+      <a href="index.html" class="btn btn-outline">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to Portfolio
+      </a>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <footer>
+     
+<div style="text-align:center; padding: 2rem 0 1rem;">
+  <p style="font-size:0.9rem; color:var(--muted); margin-bottom:1rem;">
+    Interested in working together?
+  </p>
+  <a href="index.html#contact" class="btn btn-primary">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M4 4h16v13H4z"/><path d="M4 4l8 9 8-9"/>
+    </svg>
+    Get in Touch
+  </a>
+</div>
+ 
+    <span>© 2026 Robert Anderson · UX Designer</span>
+    <span>robert anderson <span style="color:var(--electric);">ux</span></span>
+  </footer>
+
+</body>
+</html>
